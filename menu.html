@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mantis Homemade | Menü</title>
+  <meta name="description" content="Mantis Homemade dijital menü (mobil odaklı)." />
+  <meta name="theme-color" content="#f8fafc" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="menu-data.js"></script>
+
+  <style>
+    .bg-soft{
+      background:
+        radial-gradient(900px 600px at 10% 0%, rgba(255,182,193,.38), transparent 55%),
+        radial-gradient(900px 600px at 95% 10%, rgba(173,216,230,.40), transparent 52%),
+        radial-gradient(900px 700px at 50% 110%, rgba(255,236,179,.55), transparent 55%),
+        linear-gradient(180deg,#f8fafc 0%,#fff7ed 45%,#ffffff 100%);
+    }
+    .glass{
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(15,23,42,.10);
+      box-shadow: 0 14px 40px rgba(15,23,42,.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .chip{
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.80);
+    }
+    .chipActive{
+      background: rgba(255,228,230,.92);
+      border-color: rgba(244,63,94,.25);
+    }
+    .hide-scroll::-webkit-scrollbar{display:none;}
+    .hide-scroll{-ms-overflow-style:none;scrollbar-width:none;}
+  </style>
+</head>
+
+<body class="bg-soft min-h-screen text-slate-900">
+  <!-- Top bar -->
+  <header class="sticky top-0 z-50 px-4 pt-4">
+    <div class="glass rounded-3xl px-4 py-4">
+      <div class="flex items-center gap-3">
+        <button id="menuBtn" class="h-11 w-11 rounded-2xl bg-white/80 border border-slate-900/10 grid place-items-center">
+          <span class="text-xl">≡</span>
+        </button>
+
+        <div class="leading-tight">
+          <div class="text-base font-semibold tracking-tight">Mantis Homemade</div>
+          <div class="text-xs text-slate-600" id="subText">Dijital Menü</div>
+        </div>
+
+        <div class="flex-1"></div>
+
+        <select id="lang"
+          class="h-11 rounded-2xl px-3 bg-white/80 border border-slate-900/10 text-sm outline-none">
+          <option value="tr">TR</option>
+          <option value="en">EN</option>
+          <option value="mk">MK</option>
+          <option value="sq">AL</option>
+        </select>
+      </div>
+
+      <!-- Category chips (quick) -->
+      <div class="mt-3 flex gap-2 overflow-x-auto hide-scroll pb-1" id="chips"></div>
+    </div>
+
+    <!-- Drawer -->
+    <div id="drawer" class="fixed inset-0 z-[999] hidden">
+      <div class="absolute inset-0 bg-black/30" id="drawerBg"></div>
+      <aside class="absolute top-0 left-0 h-full w-[86%] max-w-sm bg-white rounded-r-3xl shadow-2xl p-4">
+        <div class="flex items-center justify-between">
+          <div class="font-semibold">Kategoriler</div>
+          <button id="closeDrawer" class="h-10 w-10 rounded-2xl bg-slate-900/5 grid place-items-center">✕</button>
+        </div>
+
+        <div class="mt-4 space-y-2" id="drawerCats"></div>
+
+        <div class="mt-6 text-xs text-slate-500 leading-relaxed">
+          Not: Bu sayfada sipariş/rezervasyon yok. Sadece menü görüntülenir.
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <!-- Grid -->
+  <main class="px-4 pb-12">
+    <section class="mt-4 glass rounded-3xl p-5">
+      <div class="flex items-center justify-between gap-3">
+        <h1 class="text-xl font-semibold tracking-tight" id="pageTitle">Menü</h1>
+        <div class="text-xs text-slate-500" id="countText"></div>
+      </div>
+      <p class="mt-1 text-sm text-slate-600">Ürüne dokun → detay sayfasında içeriği gör.</p>
+    </section>
+
+    <section class="mt-4">
+      <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+    </section>
+
+    <div class="mt-6 text-center text-xs text-slate-500">Fiyatlar: <span class="font-semibold">DEN</span></div>
+  </main>
+
+  <script>
+    const MENU = window.MANTIS_MENU || [];
+    const langEl = document.getElementById("lang");
+    const chipsEl = document.getElementById("chips");
+    const gridEl = document.getElementById("grid");
+    const drawer = document.getElementById("drawer");
+    const drawerCats = document.getElementById("drawerCats");
+
+    const state = {
+      lang: localStorage.getItem("mantis_lang") || "tr",
+      cat: (MENU[0] && MENU[0].key) || ""
+    };
+
+    const T = {
+      tr: { sub:"Dijital Menü", title:"Menü", cats:"Kategoriler" },
+      en: { sub:"Digital Menu", title:"Menu", cats:"Categories" },
+      mk: { sub:"Дигитално мени", title:"Мени", cats:"Категории" },
+      sq: { sub:"Menu Digjitale", title:"Menu", cats:"Kategoritë" },
+    };
+
+    function pick(obj){
+      return (obj && (obj[state.lang] || obj.tr || obj.sq || obj.en || obj.mk)) || "";
+    }
+
+    function openDrawer(){ drawer.classList.remove("hidden"); }
+    function closeDrawer(){ drawer.classList.add("hidden"); }
+
+    document.getElementById("menuBtn").addEventListener("click", openDrawer);
+    document.getElementById("closeDrawer").addEventListener("click", closeDrawer);
+    document.getElementById("drawerBg").addEventListener("click", closeDrawer);
+
+    function renderChips(){
+      chipsEl.innerHTML = MENU.map(c => {
+        const active = c.key === state.cat ? "chipActive" : "";
+        return `
+          <button class="chip ${active} rounded-2xl px-3 py-2 text-sm whitespace-nowrap flex items-center gap-2"
+            data-cat="${c.key}">
+            <span>${c.icon || "✦"}</span>
+            <span class="font-medium">${pick(c.title)}</span>
+          </button>
+        `;
+      }).join("");
+
+      chipsEl.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.cat = btn.getAttribute("data-cat");
+          renderChips();
+          renderGrid();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      });
+    }
+
+    function renderDrawerCats(){
+      drawerCats.innerHTML = MENU.map(c => {
+        const active = c.key === state.cat ? "bg-rose-50 border-rose-200" : "bg-slate-50 border-slate-200";
+        return `
+          <button class="w-full text-left rounded-2xl px-4 py-3 border ${active} flex items-center gap-3"
+            data-cat="${c.key}">
+            <div class="h-10 w-10 rounded-2xl bg-white border border-slate-900/10 grid place-items-center">
+              ${c.icon || "✦"}
+            </div>
+            <div class="min-w-0">
+              <div class="font-semibold truncate">${pick(c.title)}</div>
+              <div class="text-xs text-slate-500">${(c.items || []).length} ürün</div>
+            </div>
+          </button>
+        `;
+      }).join("");
+
+      drawerCats.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.cat = btn.getAttribute("data-cat");
+          closeDrawer();
+          renderChips();
+          renderGrid();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      });
+    }
+
+    function renderGrid(){
+      const cat = MENU.find(x => x.key === state.cat) || MENU[0];
+      const items = (cat && cat.items) ? cat.items : [];
+
+      document.getElementById("subText").textContent = T[state.lang].sub;
+      document.getElementById("pageTitle").textContent = T[state.lang].title;
+      document.getElementById("countText").textContent = `${items.length} ürün`;
+
+      gridEl.innerHTML = items.map(it => {
+        const nm = pick(it.name);
+        const ds = pick(it.desc);
+        const price = it.price || "";
+        const img = it.img || "";
+        const hasImg = !!img;
+
+        return `
+          <a href="product.html?id=${encodeURIComponent(it.id)}&lang=${encodeURIComponent(state.lang)}"
+             class="glass rounded-3xl p-3 block active:scale-[0.99] transition">
+            <div class="rounded-2xl overflow-hidden border border-slate-900/10 bg-gradient-to-br from-rose-100 via-amber-50 to-sky-100 h-28 grid place-items-center">
+              ${hasImg ? `<img src="${img}" alt="${nm}" class="h-full w-full object-cover">` : `<span class="text-slate-400 text-xl">✦</span>`}
+            </div>
+
+            <div class="mt-3">
+              <div class="font-semibold text-sm leading-tight line-clamp-2">${nm}</div>
+              <div class="mt-1 text-xs text-slate-600 line-clamp-2">${ds || "&nbsp;"}</div>
+              <div class="mt-2 text-sm font-semibold">${price}</div>
+            </div>
+          </a>
+        `;
+      }).join("");
+    }
+
+    langEl.value = state.lang;
+
+    langEl.addEventListener("change", () => {
+      state.lang = langEl.value;
+      localStorage.setItem("mantis_lang", state.lang);
+      renderChips();
+      renderDrawerCats();
+      renderGrid();
+    });
+
+    // init
+    renderChips();
+    renderDrawerCats();
+    renderGrid();
+  </script>
+</body>
+</html>

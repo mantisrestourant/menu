@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mantis Homemade | Ürün</title>
+  <meta name="theme-color" content="#f8fafc" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="menu-data.js"></script>
+
+  <style>
+    .bg-soft{
+      background:
+        radial-gradient(900px 600px at 10% 0%, rgba(255,182,193,.38), transparent 55%),
+        radial-gradient(900px 600px at 95% 10%, rgba(173,216,230,.40), transparent 52%),
+        radial-gradient(900px 700px at 50% 110%, rgba(255,236,179,.55), transparent 55%),
+        linear-gradient(180deg,#f8fafc 0%,#fff7ed 45%,#ffffff 100%);
+    }
+    .glass{
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(15,23,42,.10);
+      box-shadow: 0 14px 40px rgba(15,23,42,.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+  </style>
+</head>
+
+<body class="bg-soft min-h-screen text-slate-900">
+  <header class="sticky top-0 z-50 px-4 pt-4">
+    <div class="glass rounded-3xl px-4 py-4 flex items-center gap-3">
+      <a href="menu.html" class="h-11 w-11 rounded-2xl bg-white/80 border border-slate-900/10 grid place-items-center">
+        ←
+      </a>
+      <div class="leading-tight">
+        <div class="text-base font-semibold tracking-tight">Mantis Homemade</div>
+        <div class="text-xs text-slate-600" id="sub">Ürün Detayı</div>
+      </div>
+      <div class="flex-1"></div>
+      <select id="lang" class="h-11 rounded-2xl px-3 bg-white/80 border border-slate-900/10 text-sm outline-none">
+        <option value="tr">TR</option>
+        <option value="en">EN</option>
+        <option value="mk">MK</option>
+        <option value="sq">AL</option>
+      </select>
+    </div>
+  </header>
+
+  <main class="px-4 pb-12">
+    <section class="mt-4 glass rounded-3xl p-5">
+      <div id="imgWrap" class="rounded-3xl overflow-hidden border border-slate-900/10 bg-gradient-to-br from-rose-100 via-amber-50 to-sky-100 h-52 grid place-items-center">
+        <span class="text-slate-400 text-2xl" id="imgPlaceholder">✦</span>
+        <img id="img" class="hidden h-full w-full object-cover" alt="" />
+      </div>
+
+      <h1 class="mt-4 text-2xl font-semibold tracking-tight" id="name">—</h1>
+      <div class="mt-2 text-sm text-slate-600" id="cat">—</div>
+
+      <div class="mt-4 flex items-center justify-between gap-3">
+        <div class="text-xs text-slate-500">Fiyat</div>
+        <div class="text-lg font-semibold" id="price">—</div>
+      </div>
+
+      <div class="mt-4">
+        <div class="text-xs text-slate-500 mb-1" id="descTitle">Açıklama</div>
+        <p class="text-sm text-slate-700 leading-relaxed" id="desc">—</p>
+      </div>
+    </section>
+
+    <div class="mt-6 text-center text-xs text-slate-500">
+      <span id="note">Not: Alerjen bilgisi için personelden destek isteyin.</span>
+    </div>
+  </main>
+
+  <script>
+    const MENU = window.MANTIS_MENU || [];
+    const qs = new URLSearchParams(location.search);
+    const id = qs.get("id");
+    const langFromUrl = qs.get("lang");
+
+    const state = {
+      lang: langFromUrl || localStorage.getItem("mantis_lang") || "tr",
+      item: null,
+      cat: null
+    };
+
+    const T = {
+      tr: { sub:"Ürün Detayı", descTitle:"Açıklama", note:"Not: Alerjen bilgisi için personelden destek isteyin." },
+      en: { sub:"Item Details", descTitle:"Description", note:"Note: Ask our staff for allergen information." },
+      mk: { sub:"Детали", descTitle:"Опис", note:"Забелешка: Прашајте персонал за алергени." },
+      sq: { sub:"Detaje", descTitle:"Përshkrimi", note:"Shënim: Pyesni stafin për alergjenë." },
+    };
+
+    function pick(obj){
+      return (obj && (obj[state.lang] || obj.tr || obj.sq || obj.en || obj.mk)) || "";
+    }
+
+    function findItem(){
+      for (const c of MENU){
+        const it = (c.items || []).find(x => x.id === id);
+        if (it) return { it, c };
+      }
+      return null;
+    }
+
+    function render(){
+      document.getElementById("sub").textContent = T[state.lang].sub;
+      document.getElementById("descTitle").textContent = T[state.lang].descTitle;
+      document.getElementById("note").textContent = T[state.lang].note;
+
+      if (!state.item){
+        document.getElementById("name").textContent = "Ürün bulunamadı";
+        document.getElementById("desc").textContent = "";
+        return;
+      }
+
+      const nm = pick(state.item.name);
+      const ds = pick(state.item.desc) || (state.lang === "tr" ? "Bu ürün için açıklama eklenecek." : "");
+      const price = state.item.price || "";
+      const catName = pick(state.cat.title);
+
+      document.title = `Mantis Homemade | ${nm}`;
+      document.getElementById("name").textContent = nm;
+      document.getElementById("cat").textContent = catName;
+      document.getElementById("price").textContent = price;
+      document.getElementById("desc").textContent = ds;
+
+      const img = state.item.img || "";
+      const imgEl = document.getElementById("img");
+      const ph = document.getElementById("imgPlaceholder");
+
+      if (img){
+        imgEl.src = img;
+        imgEl.alt = nm;
+        imgEl.classList.remove("hidden");
+        ph.classList.add("hidden");
+      } else {
+        imgEl.classList.add("hidden");
+        ph.classList.remove("hidden");
+      }
+    }
+
+    const langEl = document.getElementById("lang");
+    langEl.value = state.lang;
+
+    langEl.addEventListener("change", () => {
+      state.lang = langEl.value;
+      localStorage.setItem("mantis_lang", state.lang);
+      render();
+    });
+
+    const found = findItem();
+    if (found){
+      state.item = found.it;
+      state.cat = found.c;
+    }
+    render();
+  </script>
+</body>
+</html>
