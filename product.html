@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mantis Homemade | Ürün</title>
+  <meta name="description" content="Mantis Homemade ürün detayı." />
+  <meta name="theme-color" content="#2d1711" />
+  <script src="menu-data.js"></script>
+  <style>
+    :root{--bg:#f8f1e8;--paper:#fffdf9;--cream:#fbf6ef;--dark:#2d1711;--brown:#5c3525;--gold:#c79a63;--muted:#7d6d64;--line:rgba(45,23,17,.11);--shadow:0 18px 45px rgba(45,23,17,.10);--shadow-strong:0 28px 70px rgba(45,23,17,.16)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(900px 500px at 0% -10%,rgba(199,154,99,.28),transparent 58%),radial-gradient(900px 520px at 100% 0%,rgba(92,53,37,.11),transparent 55%),linear-gradient(180deg,#fbf6ef 0%,#f4ede3 100%);color:var(--dark);min-height:100vh}
+    a{color:inherit;text-decoration:none}button,select{font:inherit}.page{max-width:1240px;margin:0 auto;padding:12px 14px 48px}.topbar{position:sticky;top:0;z-index:50;padding-top:6px}.nav{background:rgba(255,253,249,.92);border:1px solid var(--line);box-shadow:0 16px 38px rgba(45,23,17,.08);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:26px;padding:12px;display:flex;align-items:center;gap:12px}.back{width:44px;height:44px;border-radius:18px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;font-size:22px}.brand{min-width:0}.brand-title{font-size:18px;font-weight:850;letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brand-sub{font-size:12px;color:var(--muted);margin-top:1px}.spacer{flex:1}.lang{height:44px;border-radius:18px;border:1px solid var(--line);background:#fff;color:var(--dark);padding:0 14px;font-weight:800}.layout{display:grid;gap:16px;margin-top:16px}.panel{background:rgba(255,253,249,.92);border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);overflow:hidden}.image-panel{padding:14px}.photo{min-height:330px;border-radius:24px;border:1px solid var(--line);background:radial-gradient(circle at 50% 8%,rgba(255,255,255,.65),transparent 34%),linear-gradient(180deg,#fff7ec 0%,#ead8c5 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:18px}.photo img{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 22px 26px rgba(45,23,17,.20))}.placeholder{color:#a1938b;text-align:center}.info{padding:20px}.badge{display:inline-flex;align-items:center;gap:8px;border-radius:999px;background:var(--dark);color:#fff8ef;padding:8px 12px;font-size:13px;font-weight:800}.name{font-size:34px;line-height:1.04;letter-spacing:-.055em;font-weight:850;margin:16px 0 0}.cat{margin-top:8px;color:var(--muted);font-weight:650}.box{margin-top:16px;border:1px solid var(--line);background:#fff;border-radius:24px;padding:16px}.label{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:#9d8c82;font-weight:800}.price{margin-top:7px;font-size:30px;font-weight:850;letter-spacing:-.04em}.desc{margin:10px 0 0;color:#6e5c54;line-height:1.62}.note{margin-top:16px;border:1px solid var(--line);background:rgba(45,23,17,.05);border-radius:22px;padding:14px;color:#6e5c54;font-size:14px;line-height:1.5}.hidden{display:none!important}@media (min-width:900px){.page{padding-left:20px;padding-right:20px}.layout{grid-template-columns:1.08fr .92fr;gap:22px;align-items:start}.photo{min-height:560px}.info{padding:28px}.name{font-size:48px}.brand-title{font-size:20px}}@media (max-width:420px){.brand-title{font-size:16px}.brand-sub{font-size:11px}.lang{padding:0 10px}.photo{min-height:295px}.info{padding:18px}.name{font-size:30px}.price{font-size:26px}}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <nav class="nav" aria-label="Ürün menüsü">
+        <a class="back" href="index.html" aria-label="Menüye dön">←</a>
+        <div class="brand"><div class="brand-title">Mantis Homemade</div><div class="brand-sub" id="sub">Ürün Detayı</div></div>
+        <div class="spacer"></div>
+        <select id="lang" class="lang" aria-label="Dil seçimi"><option value="tr">TR</option><option value="en">EN</option><option value="mk">MK</option><option value="sq">AL</option></select>
+      </nav>
+    </header>
+
+    <main class="layout">
+      <section class="panel image-panel">
+        <div class="photo"><span id="imgPlaceholder" class="placeholder">Fotoğraf eklenecek</span><img id="img" class="hidden" alt="" onerror="this.classList.add('hidden');document.getElementById('imgPlaceholder').classList.remove('hidden');" /></div>
+      </section>
+      <section class="panel info">
+        <div class="badge"><span>🍽️</span><span id="badge">Ürün Bilgisi</span></div>
+        <h1 class="name" id="name">—</h1>
+        <div class="cat" id="cat">—</div>
+        <div class="box" id="priceBox"><div class="label" id="priceLabel">Fiyat</div><div class="price" id="price">—</div></div>
+        <div class="box hidden" id="descBox"><div class="label" id="descTitle">Açıklama</div><p class="desc" id="desc"></p></div>
+        <div class="note" id="note">Alerjen bilgisi için personelden destek isteyin.</div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const MENU = window.MANTIS_MENU || [];
+    const qs = new URLSearchParams(location.search);
+    const id = qs.get('id');
+    const state = { lang: qs.get('lang') || localStorage.getItem('mantis_lang') || 'tr', item: null, cat: null };
+    const T = {
+      tr:{sub:'Ürün Detayı', badge:'Ürün Bilgisi', price:'Fiyat', desc:'Açıklama', note:'Alerjen bilgisi için personelden destek isteyin.', missing:'Ürün bulunamadı', photo:'Fotoğraf eklenecek'},
+      en:{sub:'Item Details', badge:'Item Info', price:'Price', desc:'Description', note:'Ask our staff for allergen information.', missing:'Item not found', photo:'Photo will be added'},
+      mk:{sub:'Детали', badge:'Информации', price:'Цена', desc:'Опис', note:'Прашајте го персоналот за алергени.', missing:'Производот не е пронајден', photo:'Ќе се додаде фотографија'},
+      sq:{sub:'Detaje', badge:'Informacion', price:'Çmimi', desc:'Përshkrimi', note:'Pyesni stafin për alergjenë.', missing:'Produkti nuk u gjet', photo:'Fotografia do të shtohet'}
+    };
+    const pick = (obj) => (obj && (obj[state.lang] || obj.tr || obj.sq || obj.en || obj.mk)) || '';
+    function findItem(){ for (const c of MENU){ const it = (c.items || []).find(x => x.id === id); if (it) return {it, c}; } return null; }
+    function render(){
+      const t = T[state.lang];
+      document.documentElement.lang = state.lang;
+      document.getElementById('sub').textContent = t.sub;
+      document.getElementById('badge').textContent = t.badge;
+      document.getElementById('priceLabel').textContent = t.price;
+      document.getElementById('descTitle').textContent = t.desc;
+      document.getElementById('note').textContent = t.note;
+      document.getElementById('imgPlaceholder').textContent = t.photo;
+      if (!state.item){
+        document.getElementById('name').textContent = t.missing;
+        document.getElementById('cat').textContent = '';
+        document.getElementById('priceBox').classList.add('hidden');
+        document.getElementById('descBox').classList.add('hidden');
+        return;
+      }
+      const name = pick(state.item.name), desc = pick(state.item.desc), price = state.item.price || '', img = state.item.img || '';
+      document.title = `Mantis Homemade | ${name}`;
+      document.getElementById('name').textContent = name;
+      document.getElementById('cat').textContent = pick(state.cat.title);
+      document.getElementById('price').textContent = price;
+      document.getElementById('priceBox').classList.toggle('hidden', !price);
+      document.getElementById('desc').textContent = desc;
+      document.getElementById('descBox').classList.toggle('hidden', !desc);
+      const im = document.getElementById('img'), ph = document.getElementById('imgPlaceholder');
+      if (img){ im.src = img; im.alt = name; im.classList.remove('hidden'); ph.classList.add('hidden'); }
+      else { im.removeAttribute('src'); im.classList.add('hidden'); ph.classList.remove('hidden'); }
+    }
+    const found = findItem(); if (found){ state.item = found.it; state.cat = found.c; }
+    const lang = document.getElementById('lang'); lang.value = state.lang;
+    lang.addEventListener('change', () => { state.lang = lang.value; localStorage.setItem('mantis_lang', state.lang); render(); });
+    render();
+  </script>
+</body>
+</html>

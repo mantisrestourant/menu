@@ -1,0 +1,6 @@
+categories=10
+items=144
+unique_images=108
+duplicate_ids=0
+missing_image_refs=0
+empty_image_items=0

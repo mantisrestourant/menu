@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mantis Homemade | Online QR Menü</title>
+  <meta name="description" content="Mantis Homemade online QR restoran menüsü." />
+  <meta name="theme-color" content="#2d1711" />
+  <script src="menu-data.js"></script>
+  <style>
+    :root{
+      --bg:#f8f1e8;
+      --paper:#fffdf9;
+      --cream:#fbf6ef;
+      --dark:#2d1711;
+      --brown:#5c3525;
+      --gold:#c79a63;
+      --muted:#7d6d64;
+      --line:rgba(45,23,17,.11);
+      --shadow:0 18px 45px rgba(45,23,17,.10);
+      --shadow-strong:0 28px 70px rgba(45,23,17,.16);
+      --radius:28px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(900px 500px at 0% -10%,rgba(199,154,99,.28),transparent 58%),radial-gradient(900px 520px at 100% 0%,rgba(92,53,37,.11),transparent 55%),linear-gradient(180deg,#fbf6ef 0%,#f4ede3 100%);color:var(--dark);min-height:100vh}
+    a{color:inherit;text-decoration:none}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .page{max-width:1240px;margin:0 auto;padding:12px 14px 48px}
+    .topbar{position:sticky;top:0;z-index:50;padding-top:6px}
+    .nav{background:rgba(255,253,249,.92);border:1px solid var(--line);box-shadow:0 16px 38px rgba(45,23,17,.08);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:26px;padding:12px;display:flex;align-items:center;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .brand-mark{width:44px;height:44px;border-radius:18px;background:var(--dark);color:#fff8ef;display:grid;place-items:center;font-weight:800;box-shadow:0 12px 24px rgba(45,23,17,.18)}
+    .brand-title{font-size:18px;font-weight:800;letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand-sub{font-size:12px;color:var(--muted);margin-top:1px}
+    .nav-spacer{flex:1}
+    .category-toggle,.lang{height:44px;border-radius:18px;border:1px solid var(--line);background:#fff;color:var(--dark);padding:0 14px;font-weight:700;display:flex;align-items:center;gap:8px}
+    .category-toggle{background:var(--dark);color:#fff8ef;border-color:var(--dark)}
+    .desktop-cats{display:none;margin-top:10px;background:rgba(255,253,249,.72);border:1px solid var(--line);border-radius:24px;padding:8px;gap:8px;overflow-x:auto;box-shadow:0 12px 30px rgba(45,23,17,.05)}
+    .cat-chip{border:1px solid var(--line);background:#fff;border-radius:18px;padding:10px 14px;color:var(--brown);font-size:14px;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;transition:.18s ease}
+    .cat-chip:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(45,23,17,.09)}
+    .cat-chip.active{background:var(--dark);color:#fff8ef;border-color:var(--dark);box-shadow:0 12px 28px rgba(45,23,17,.18)}
+    .hero{margin-top:16px;background:var(--dark);color:#fff8ef;border-radius:30px;overflow:hidden;box-shadow:var(--shadow-strong);position:relative}
+    .hero:before{content:"";position:absolute;inset:-40% -10% auto auto;width:520px;height:320px;background:radial-gradient(circle,rgba(199,154,99,.58),transparent 65%);opacity:.75}
+    .hero-inner{position:relative;padding:22px;display:grid;gap:18px}
+    .badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.09);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:700;width:max-content}
+    h1{margin:12px 0 0;font-size:30px;line-height:1.02;letter-spacing:-.05em}
+    .hero p{margin:8px 0 0;color:rgba(255,248,239,.74);line-height:1.55;max-width:680px}
+    .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .stat{border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);border-radius:22px;padding:13px}
+    .stat-label{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:rgba(255,248,239,.48)}
+    .stat-value{margin-top:6px;font-weight:800;font-size:16px}
+    .search-card{margin-top:14px;background:rgba(255,253,249,.92);border:1px solid var(--line);border-radius:24px;padding:10px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 30px rgba(45,23,17,.06)}
+    .search-icon{width:42px;height:42px;border-radius:16px;background:rgba(45,23,17,.06);display:grid;place-items:center;color:var(--brown);font-size:20px}
+    .search-input{width:100%;border:0;background:transparent;outline:0;color:var(--dark);font-size:16px}
+    .search-input::placeholder{color:#a1938b}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:18px}
+    .card{background:var(--paper);border:1px solid var(--line);border-radius:28px;overflow:hidden;box-shadow:var(--shadow);transition:.2s ease;display:flex;flex-direction:column;min-height:100%}
+    .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-strong)}
+    .photo{aspect-ratio:1.08/1;background:radial-gradient(circle at 50% 8%,rgba(255,255,255,.65),transparent 34%),linear-gradient(180deg,#fff7ec 0%,#ead8c5 100%);border-bottom:1px solid var(--line);padding:14px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .photo img{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 18px 22px rgba(45,23,17,.18));transition:.3s ease}
+    .card:hover .photo img{transform:scale(1.035)}
+    .placeholder{color:#a1938b;font-size:14px;text-align:center}
+    .card-body{padding:15px 16px 17px;display:flex;flex-direction:column;gap:10px;flex:1}
+    .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .product-name{font-size:18px;line-height:1.18;font-weight:800;letter-spacing:-.025em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .price{flex:0 0 auto;border-radius:999px;background:var(--dark);color:#fff8ef;padding:7px 11px;font-size:13px;font-weight:800;white-space:nowrap}
+    .desc{margin:0;color:var(--muted);font-size:14px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    .card-foot{margin-top:auto;color:var(--brown);font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .category-badge{font-size:12px;color:#8b766b;background:rgba(45,23,17,.06);border-radius:999px;padding:6px 9px;max-width:62%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .empty{display:none;margin-top:18px;background:rgba(255,253,249,.92);border:1px solid var(--line);border-radius:26px;padding:28px;text-align:center;color:var(--muted);box-shadow:var(--shadow)}
+    .empty.show{display:block}
+    .drawer{position:fixed;inset:0;z-index:999;display:none}
+    .drawer.show{display:block}
+    .drawer-bg{position:absolute;inset:0;background:rgba(0,0,0,.46);border:0;width:100%;height:100%}
+    .drawer-panel{position:absolute;top:0;right:0;width:min(90vw,390px);height:100%;background:#fffaf5;border-radius:30px 0 0 30px;box-shadow:-24px 0 60px rgba(0,0,0,.22);padding:18px;overflow:auto}
+    .drawer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+    .drawer-title{font-size:22px;font-weight:850;letter-spacing:-.03em}
+    .drawer-desc{font-size:14px;color:var(--muted);margin-top:4px}
+    .close-btn{width:44px;height:44px;border-radius:16px;border:0;background:var(--dark);color:#fff;font-weight:800}
+    .drawer-list{display:grid;gap:8px}
+    .drawer-cat{width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:18px;padding:12px 14px;color:var(--dark);transition:.18s ease}
+    .drawer-cat.active{background:var(--dark);color:#fff8ef;border-color:var(--dark)}
+    .drawer-cat-title{font-weight:800;display:flex;gap:8px;align-items:center}
+    .drawer-cat-count{font-size:12px;color:#8b766b;margin-top:4px}.drawer-cat.active .drawer-cat-count{color:rgba(255,248,239,.68)}
+    body.drawer-open{overflow:hidden}
+    @media (min-width:680px){.page{padding-left:20px;padding-right:20px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.hero-inner{grid-template-columns:1.3fr .7fr;align-items:end;padding:26px}h1{font-size:38px}.desktop-cats{display:flex}.category-toggle .label{display:inline}.photo{aspect-ratio:1.15/1}}
+    @media (min-width:1100px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}.brand-title{font-size:20px}.hero-inner{padding:30px}.photo{aspect-ratio:1.2/1}}
+    @media (max-width:420px){.brand-title{font-size:16px}.brand-sub{font-size:11px}.category-toggle{padding:0 12px}.category-toggle .label{display:none}.hero-inner{padding:18px}h1{font-size:26px}.photo{aspect-ratio:1/0.86}.product-name{font-size:17px}.price{font-size:12px;padding:6px 9px}}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <nav class="nav" aria-label="Ana menü">
+        <a class="brand" href="index.html" aria-label="Mantis Homemade ana menü">
+          <div class="brand-mark">M</div>
+          <div class="brand-copy">
+            <div class="brand-title">Mantis Homemade</div>
+            <div class="brand-sub" id="subText">Online QR Menü</div>
+          </div>
+        </a>
+        <div class="nav-spacer"></div>
+        <button id="menuBtn" class="category-toggle" type="button" aria-controls="drawer" aria-expanded="false"><span>☰</span><span class="label" id="catBtnText">Kategoriler</span></button>
+        <select id="lang" class="lang" aria-label="Dil seçimi">
+          <option value="tr">TR</option>
+          <option value="en">EN</option>
+          <option value="mk">MK</option>
+          <option value="sq">AL</option>
+        </select>
+      </nav>
+      <div class="desktop-cats" id="desktopCats" aria-label="Kategoriler"></div>
+    </header>
+
+    <aside class="drawer" id="drawer" aria-hidden="true">
+      <button class="drawer-bg" id="drawerBg" aria-label="Menüyü kapat"></button>
+      <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+        <div class="drawer-head">
+          <div>
+            <div class="drawer-title" id="drawerTitle">Kategoriler</div>
+            <div class="drawer-desc" id="drawerDesc">Menü bölümleri arasında geçiş yapın.</div>
+          </div>
+          <button class="close-btn" id="closeDrawer" type="button" aria-label="Kapat">✕</button>
+        </div>
+        <div class="drawer-list" id="drawerCats"></div>
+      </div>
+    </aside>
+
+    <main>
+      <section class="hero" aria-labelledby="pageTitle">
+        <div class="hero-inner">
+          <div>
+            <div class="badge"><span>🍽️</span><span id="heroBadge">Restoran menüsü</span></div>
+            <h1 id="pageTitle">Mantis Menü</h1>
+            <p id="heroText">Kategoriyi seç, ürünleri fotoğraflarıyla hızlıca incele.</p>
+          </div>
+          <div class="hero-stats">
+            <div class="stat"><div class="stat-label" id="catLabel">Kategori</div><div class="stat-value" id="catName">—</div></div>
+            <div class="stat"><div class="stat-label" id="itemLabel">Ürün</div><div class="stat-value" id="countText">—</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="search-card" aria-label="Ürün arama">
+        <div class="search-icon">⌕</div>
+        <input id="search" class="search-input" type="search" placeholder="Ürün ara..." autocomplete="off" />
+      </section>
+
+      <section>
+        <div class="grid" id="grid"></div>
+        <div class="empty" id="empty">Sonuç bulunamadı.</div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const MENU = window.MANTIS_MENU || [];
+    const els = {
+      lang: document.getElementById('lang'),
+      desktopCats: document.getElementById('desktopCats'),
+      drawer: document.getElementById('drawer'),
+      drawerCats: document.getElementById('drawerCats'),
+      grid: document.getElementById('grid'),
+      empty: document.getElementById('empty'),
+      search: document.getElementById('search'),
+      menuBtn: document.getElementById('menuBtn')
+    };
+
+    const state = {
+      lang: localStorage.getItem('mantis_lang') || 'tr',
+      cat: (MENU[0] && MENU[0].key) || '',
+      q: ''
+    };
+
+    const T = {
+      tr: { sub:'Online QR Menü', title:'Mantis Menü', badge:'Restoran menüsü', hero:'Kategoriyi seç, ürünleri fotoğraflarıyla hızlıca incele.', cats:'Kategoriler', catDesc:'Menü bölümleri arasında geçiş yapın.', search:'Ürün ara...', count:n=>`${n} ürün`, detail:'Detaya bak', category:'Kategori', item:'Ürün', empty:'Sonuç bulunamadı.', allResults:'Arama sonuçları' },
+      en: { sub:'Online QR Menu', title:'Mantis Menu', badge:'Restaurant menu', hero:'Choose a category and quickly browse products with photos.', cats:'Categories', catDesc:'Switch between menu sections.', search:'Search product...', count:n=>`${n} items`, detail:'View details', category:'Category', item:'Item', empty:'No results found.', allResults:'Search results' },
+      mk: { sub:'Online QR мени', title:'Mantis Мени', badge:'Ресторанско мени', hero:'Изберете категорија и брзо разгледајте производи со фотографии.', cats:'Категории', catDesc:'Преминете меѓу секциите на менито.', search:'Пребарај...', count:n=>`${n} производи`, detail:'Детали', category:'Категорија', item:'Производ', empty:'Нема резултати.', allResults:'Резултати' },
+      sq: { sub:'Online QR Menu', title:'Mantis Menu', badge:'Menu restoranti', hero:'Zgjidh kategorinë dhe shiko shpejt produktet me fotografi.', cats:'Kategoritë', catDesc:'Kaloni mes seksioneve të menusë.', search:'Kërko produkt...', count:n=>`${n} produkte`, detail:'Shiko detajet', category:'Kategori', item:'Produkt', empty:'Nuk u gjet rezultat.', allResults:'Rezultatet' }
+    };
+
+    const pick = (obj) => (obj && (obj[state.lang] || obj.tr || obj.sq || obj.en || obj.mk)) || '';
+    const esc = (s) => String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    const currentCat = () => MENU.find(c => c.key === state.cat) || MENU[0] || {items:[], title:{}};
+
+    function openDrawer(){
+      els.drawer.classList.add('show');
+      els.drawer.setAttribute('aria-hidden', 'false');
+      els.menuBtn.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('drawer-open');
+    }
+    function closeDrawer(){
+      els.drawer.classList.remove('show');
+      els.drawer.setAttribute('aria-hidden', 'true');
+      els.menuBtn.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('drawer-open');
+    }
+
+    document.getElementById('menuBtn').addEventListener('click', openDrawer);
+    document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
+    document.getElementById('drawerBg').addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+    function renderText(){
+      const t = T[state.lang];
+      document.documentElement.lang = state.lang;
+      document.getElementById('subText').textContent = t.sub;
+      document.getElementById('pageTitle').textContent = t.title;
+      document.getElementById('heroBadge').textContent = t.badge;
+      document.getElementById('heroText').textContent = t.hero;
+      document.getElementById('drawerTitle').textContent = t.cats;
+      document.getElementById('drawerDesc').textContent = t.catDesc;
+      document.getElementById('catBtnText').textContent = t.cats;
+      document.getElementById('catLabel').textContent = t.category;
+      document.getElementById('itemLabel').textContent = t.item;
+      els.search.placeholder = t.search;
+      els.empty.textContent = t.empty;
+    }
+
+    function catButton(c){
+      const active = c.key === state.cat ? 'active' : '';
+      return `<button class="cat-chip ${active}" data-cat="${esc(c.key)}" type="button"><span>${c.icon || '•'}</span>${esc(pick(c.title))}</button>`;
+    }
+
+    function bindCategoryButtons(root){
+      root.querySelectorAll('[data-cat]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.cat = btn.dataset.cat;
+          state.q = '';
+          els.search.value = '';
+          closeDrawer();
+          render();
+          window.scrollTo({top:0, behavior:'smooth'});
+        });
+      });
+    }
+
+    function renderCategories(){
+      els.desktopCats.innerHTML = MENU.map(catButton).join('');
+      bindCategoryButtons(els.desktopCats);
+
+      els.drawerCats.innerHTML = MENU.map(c => {
+        const active = c.key === state.cat ? 'active' : '';
+        return `<button class="drawer-cat ${active}" data-cat="${esc(c.key)}" type="button">
+          <div class="drawer-cat-title"><span>${c.icon || '•'}</span><span>${esc(pick(c.title))}</span></div>
+          <div class="drawer-cat-count">${T[state.lang].count((c.items || []).length)}</div>
+        </button>`;
+      }).join('');
+      bindCategoryButtons(els.drawerCats);
+    }
+
+    function buildItems(){
+      const query = state.q.trim().toLowerCase();
+      if (query) {
+        return MENU.flatMap(c => (c.items || []).map(it => ({...it, _cat: c}))).filter(it => {
+          return [pick(it.name), pick(it.desc), it.price, pick(it._cat.title)].join(' ').toLowerCase().includes(query);
+        });
+      }
+      const cat = currentCat();
+      return (cat.items || []).map(it => ({...it, _cat: cat}));
+    }
+
+    function renderGrid(){
+      const t = T[state.lang];
+      const query = state.q.trim();
+      const cat = currentCat();
+      const items = buildItems();
+
+      document.getElementById('catName').textContent = query ? t.allResults : pick(cat.title);
+      document.getElementById('countText').textContent = t.count(items.length);
+      els.empty.classList.toggle('show', items.length === 0);
+
+      els.grid.innerHTML = items.map(it => {
+        const name = pick(it.name);
+        const desc = pick(it.desc);
+        const price = it.price || '';
+        const img = it.img || '';
+        const catName = pick(it._cat.title);
+        return `<a class="card" href="product.html?id=${encodeURIComponent(it.id)}&lang=${encodeURIComponent(state.lang)}">
+          <div class="photo">${img ? `<img src="${esc(img)}" alt="${esc(name)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><div class="placeholder" style="display:none">Fotoğraf eklenecek</div>` : `<div class="placeholder">Fotoğraf eklenecek</div>`}</div>
+          <div class="card-body">
+            <div class="card-top">
+              <div class="product-name">${esc(name)}</div>
+              ${price ? `<div class="price">${esc(price)}</div>` : ''}
+            </div>
+            ${desc ? `<p class="desc">${esc(desc)}</p>` : ''}
+            <div class="card-foot"><span>${t.detail} →</span>${query ? `<span class="category-badge">${esc(catName)}</span>` : ''}</div>
+          </div>
+        </a>`;
+      }).join('');
+    }
+
+    function render(){
+      renderText();
+      renderCategories();
+      renderGrid();
+    }
+
+    els.lang.value = state.lang;
+    els.lang.addEventListener('change', () => {
+      state.lang = els.lang.value;
+      localStorage.setItem('mantis_lang', state.lang);
+      render();
+    });
+    els.search.addEventListener('input', e => {
+      state.q = e.target.value;
+      renderGrid();
+    });
+
+    render();
+  </script>
+</body>
+</html>
